@@ -1,3 +1,5 @@
+"use strict";
+
 const fs = remote.require('fs');
 const { 
     BrowserWindow,
@@ -7,7 +9,6 @@ const {
 let inputArea = null;
 let inputTxt = null;
 let footerArea = null;
-
 
 let currentPath = "";
 let editor = null;
@@ -27,15 +28,15 @@ function onLoad() {
 
     setEditorTheme();
 
-    document.addEventListener('dragover', (event) => {
-        event.preventDefault();
+    document.addEventListener('dragover', (e) => {
+        e.preventDefault();
     });
-    document.addEventListener("drop", (event) => {
-        event.preventDefault();
+    document.addEventListener("drop", (e) => {
+        e.preventDefault();
     });
 
-    inputArea.addEventListener("dragover", (event) => {
-        event.preventDefault();
+    inputArea.addEventListener("dragover", (e) => {
+        e.preventDefault();
     });
     inputArea.addEventListener("dragleave", (e) => {
         e.preventDefault();
@@ -55,7 +56,30 @@ function onLoad() {
     document.querySelector("#btnSave").addEventListener("click", () => {
         saveFile();
     });
+    // メニュー制御
+    menuOperation();
 };
+
+// メニューから制御
+function menuOperation(){
+    ipcRenderer.on("main_file_message", (event, arg) => {
+        console.log(arg);
+        if(arg){
+            switch(arg){
+                case "open":
+                    openLoadFile();
+                    break;
+                case "save":
+                    saveFile();
+                    break;
+                case "save_new_file":
+                    saveNewFile();
+                    break;
+            }
+        }
+    })
+}
+
 
 function openLoadFile() {
     const win = BrowserWindow.getFocusedWindow();
@@ -98,6 +122,7 @@ function saveFile() {
     }
     const win = BrowserWindow.getFocusedWindow();
 
+    //FIXME このダイアログは微妙
     dialog.showMessageBox(win, {
         title: "ファイルの上書き保存を行います",
         type: "info",

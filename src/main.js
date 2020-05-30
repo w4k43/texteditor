@@ -5,7 +5,6 @@ const url = require('url');
 let mainWindow;
 
 function createWindow(){
-
     // ウィンドウ作成
     mainWindow  = new BrowserWindow(
         {
@@ -58,12 +57,30 @@ function createMenu(){
         submenu: [
             {
                 label: "開く",
+                accelerator: "CmdOrCtrl+O",
+                click: function(item, focusedWindow) {
+                    if(focusedWindow){
+                        focusedWindow.webContents.send("main_file_message", "open");
+                    }
+                }
             },
             {
                 label: "保存",
+                accelerator: "CmdOrCtrl+S",
+                click: function(item, focusedWindow) {
+                    if(focusedWindow){
+                        focusedWindow.webContents.send("main_file_message", "save");
+                    }
+                }
             },
             {
-                label: "名前を付けて保存"
+                label: "名前を付けて保存",
+                accelerator: "CmdOrCtrl+Shift+S",
+                click: function(item, focusedWindow) {
+                    if(focusedWindow){
+                        focusedWindow.webContents.send("main_file_message", "save_new_file");
+                    }
+                }
             }
         ]
     };
@@ -72,15 +89,23 @@ function createMenu(){
         submenu: [
             {
                 label: "やり直し",
+                accelerator: "CmdOrCtrl+Z",
+                role: "undo"
             },
             {
                 label: "切り取り",
+                accelerator: "CmdOrCtrl+X",
+                role: "cut"
             },
             {
-                label: "コピー"
+                label: "コピー",
+                accelerator: "CmdOrCtrl+C",
+                role: "copy"
             },
             {
-                label: "貼り付け"
+                label: "貼り付け",
+                accelerator: "CmdOrCtrl+V",
+                role: "paste"
             }
         ]
     };
@@ -89,15 +114,31 @@ function createMenu(){
         submenu: [
             {
                 label: "全画面表示",
+                accelerator: (function(){
+                    if(process.platform === "darwin"){
+                        return "Ctrl+Command+F";
+                    } else {
+                        return "F11";
+                    }
+                })(),
+                click: function(item, focusedWindow) {
+                    focusedWindow.setFullScreen(!focusedWindow.isFullScreen());
+                }
             },
             {
                 label: "拡大",
+                accelerator: "CmdOrCtrl+Shift+=",
+                role: "zoomin"
             },
             {
-                label: "縮小"
+                label: "縮小",
+                accelerator: "CmdOrCtrl+Shift+-",
+                role: "zoomout"
             },
             {
-                label: "リセット"
+                label: "リセット",
+                accelerator: "CmdOrCtrl+0",
+                role: "resetzoom"
             }
         ]
     };
